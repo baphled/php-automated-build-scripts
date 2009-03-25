@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!-- Author: Yomi Colledge 
+	Build file used by thing to automatically generate our staging & production environment.
+
+	Change PROJECT_NAME to the name of the project
+-->
+
+<!-- build XML -->
+<project name="PROJECT_NAME" default="build">
+
+  <!-- Set our properties -->
+  <property name="package"  value="${phing.project.name}" override="true" />
+  <property name="builddir" value="html" override="true" />
+  <property name="srcdir"   value="${project.basedir}" override="true" />
+  <property name="svn" value="SVN_LOCATION" override="true" />
+  <property name="svn_user" value="SVN_USER" />
+  <property name="svn_pass" value="SVN_PASSWORD" />
+
+  <!-- Our filesets -->
+  <fileset dir="configs/" id="configs">
+	<include name="settings.ini" />
+  </fileset>
+  
+  <!--  
+  		We want to be able to get the settings.ini file from the current directory
+  		this will then be modified and copied to the configs directory of the project
+   -->
+
+  <!-- Targets -->
+  <target name="build" depends="configSetup">
+  	<echo>"Building project: ${package}"</echo>
+  	<!-- Delete a directory -->
+  	<echo>"Removing Test files"</echo>
+	<delete dir="${builddir}/tests" includeemptydirs="true" verbose="true" failonerror="true" />
+	<echo>${projectname}" successfully built."</echo>
+  </target>
+  
+	<target name="remove">
+	  	<echo>"Building project: ${package}"</echo>
+	  	<!-- Delete a directory -->
+	  	<echo>"Removing html directory"</echo>
+		<delete dir="${builddir}" includeemptydirs="true" verbose="true" failonerror="true" />
+	</target>
+  
+  <!-- Get everything from SVN -->
+  <target name="svn" depends="remove">
+  	<propertyprompt propertyName="svn" defaultValue="${phing.svn}"
+			promptText="Enter your the location of SVN:" />
+	<svnexport
+	   	svnpath="/usr/bin/svn"
+   		username="${svn_user}"
+	   	password="${svn_pass}"
+	   	nocache="true"
+	   	repositoryurl="${svn}"
+  	 	todir="${builddir}"/>
+  </target>
+	
+  <!-- We'll need to configure our settings file now -->
+
+  <!-- Stores our environment setting -->
+  <target name="setConfigVars" depends="svn">
+    <propertyprompt propertyName="environment" defaultValue="staging"
+			promptText="Enter your environment (staging,production):" />
+  </target>
+
+  <!-- Setup our configuration settings. -->
+  <target name="configSetup" depends="setConfigVars">
+    <copy todir="${builddir}/configs" overwrite="true">
+	<fileset refid="configs" />
+	
+	<!-- We want to replace all instances of our customisable settings with the user defined version -->
+	<!-- If none is used we'll use the $environment version or default if that is not set. 	-->
+	<filterchain>
+	  <replacetokens  begintoken="@@" endtoken="@@">
+		<token key="environment" value="${environment}" />
+	  </replacetokens>
+	  <replacetokens  begintoken="@@" endtoken="@@">
+		<token key="api" value="${api}" />
+	  </replacetokens>
+	</filterchain>
+    </copy>
+  </target>
+</project>
