@@ -1,0 +1,46 @@
+<project name="PROJECT_NAME" default="build" basedir=".">
+	<target name='build' depends='checkout,change_env,test,api-clean,api-mkdir,php-documentor,php-codesniffer'/>
+	<target name='api-clean'>
+		<exec executable='rm' dir='${basedir}/build'>
+		        <arg line='-rf api'/>
+		</exec>
+	</target>
+	<target name='api-mkdir'>
+		<exec executable='mkdir' dir='${basedir}/build/'>
+			<arg line='api'/>
+		</exec>
+	</target>
+	<target name='checkout'>
+		<exec dir='${basedir}/source/' executable='svn'>
+			<arg line='up'/>
+		</exec>
+	</target>
+	<target name='change_env'>
+		<exec dir='${basedir}/' executable='./rename.sh' />
+	</target>
+
+	<target name="test">
+		<exec executable='phpunit' dir='${basedir}/source/tests/suites' failonerror='on'>
+			<arg line='--log-xml ${basedir}/build/logs/phpunit.xml 
+        			--log-pmd ${basedir}/build/logs/phpunit.pmd.xml 
+			        --log-metrics ${basedir}/build/logs/phpunit.metrics.xml 
+			        --coverage-xml ${basedir}/build/logs/phpunit.coverage.xml 
+			        --coverage-html ${basedir}/build/coverage 
+			        ${name}Tests AllTests.php' />
+		</exec>
+	</target>
+	<target name='php-documentor'>
+		<exec executable='phpdoc' dir='${basedir}/source'>
+			<arg line='-s on -ct type -ue on -t ${basedir}/build/api -tb /usr/share/pear/data/phpUnderControl/data/phpdoc -o HTML:Phpuc:phpuc -d ${basedir}/source '/>
+		</exec>
+	</target>
+	<target name="php-codesniffer">
+		<exec executable="phpcs" 
+		        dir="${basedir}/source"
+		        error="/tmp/checkstyle.error.log"
+		        output="${basedir}/build/logs/checkstyle.xml">
+		        <arg line="--report=checkstyle 
+	        	        --standard=Zend application library test public"/>
+		</exec>
+	</target>
+</project>
