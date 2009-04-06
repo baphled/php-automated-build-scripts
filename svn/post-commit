@@ -45,7 +45,7 @@ body << "</p>"
 body << "<hr noshade>"
 
 # Get and output the patch.
-changes=`#{author} - #{svnlook} diff #{repo} -r #{rev}`
+changes=`#{svnlook} diff #{repo} -r #{rev}`
 body << "<pre>"
 changes.split('\n').each() {
     |line|
@@ -66,7 +66,7 @@ body << "</pre>"
 header = ""
 header << "To: #{address}\n"
 header << "From: #{address}\n"
-header << "Subject: #{repo} revision #{rev}\n"
+header << "Subject: #{author} - #{repo} revision #{rev}\n"
 header << "Reply-to: #{address}\n"
 header << "MIME-Version: 1.0\n"
 header << "Content-Type: text/html; charset=UTF-8\n"
