@@ -7,8 +7,8 @@
 # ------------------------------------------------------------------------
 
 # You *will* need to change these.
-
-address="EMAIL"
+domain="DOMAIN"
+address="NAME@#{domain}"
 sendmail="/usr/sbin/sendmail"
 svnlook="/usr/bin/svnlook"
 
@@ -65,9 +65,9 @@ body << "</pre>"
 # Write the header.
 header = ""
 header << "To: #{address}\n"
-header << "From: #{address}\n"
+header << "From: #{author}@#{domain}\n"
 header << "Subject: #{author} - #{repo} revision #{rev}\n"
-header << "Reply-to: #{address}\n"
+header << "Reply-to: #{author}@#{domain}\n"
 header << "MIME-Version: 1.0\n"
 header << "Content-Type: text/html; charset=UTF-8\n"
 header << "Content-Transfer-Encoding: 8bit\n"
